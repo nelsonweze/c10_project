@@ -1,16 +1,22 @@
 # c10_project
 
-A new Flutter project.
 
-## Getting Started
+## DEVELOPMENT GOALS
 
-This project is a starting point for a Flutter application.
+The software product is intended to:
+The development of a mobile application that recommends to a freshman 
+classes for them to undertake based on their input.
 
-A few resources to get you started if this is your first Flutter project:
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+###Branch Policy:
+      There are two main branches, ‘main’ which is the production branch and ‘dev’
+      which is the development branch. All the features/changes which will be added to the
+      project would follow these pattern;
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- Create a branch from dev as issue_no of issue 
+- update/add/delete
+- test  issue_no of issue
+- create a merge request to dev & test dev
+- merge to the dev branch
+- create a merge request to master & test main
+- merge to the main
