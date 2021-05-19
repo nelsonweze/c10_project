@@ -1,7 +1,12 @@
 import 'dart:math';
+import 'package:c10_project/login_page.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 
@@ -159,73 +164,104 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'C10 Project',
-        ),
-      ),
-      body: Center(
-        child: Container(
-          constraints: BoxConstraints(maxWidth: 400),
-          child: ListView(
-            children: <Widget>[
-              Container(
-                padding: const EdgeInsets.only(bottom: 20.0, top: 30),
-                child: Text(
-                  'Fill in the fields with your scores. When you are done, Submit your answers to get a recommendation.',
-                  textAlign: TextAlign.center,
-                ),
+    return StreamBuilder<User>(
+        stream: FirebaseAuth.instance.userChanges(),
+        builder: (context, snapshot) {
+          var user = FirebaseAuth.instance.currentUser;
+          var loggedIn = user != null;
+
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(
+                'C10 Project',
               ),
-              ...List.generate(
-                list.length,
-                (index) => Container(
-                  padding: const EdgeInsets.only(bottom: 12.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 4.0),
-                        child: Text(list[index].title),
+              centerTitle: true,
+              actions: [
+                loggedIn
+                    ? Center(
+                        child: Text(user.email,
+                            style: TextStyle(
+                              color: Colors.white,
+                            )),
+                      )
+                    : TextButton(
+                        child: Text('Log in',
+                            style: TextStyle(
+                              color: Colors.white,
+                            )),
+                        onPressed: () => Navigator.push(
+                            context,
+                            DialogRoute(
+                                context: context,
+                                builder: (context) => LoginPage()))),
+                SizedBox(
+                  width: 60,
+                )
+              ],
+            ),
+            body: Center(
+              child: Container(
+                constraints: BoxConstraints(maxWidth: 400),
+                child: ListView(
+                  children: <Widget>[
+                    Container(
+                      padding: const EdgeInsets.only(bottom: 20.0, top: 30),
+                      child: Text(
+                        'Fill in the fields with your scores. When you are done, Submit your answers to get a recommendation.',
+                        textAlign: TextAlign.center,
                       ),
-                      TextFormField(
-                        decoration: InputDecoration(
-                          labelText: 'Enter your score',
-                          floatingLabelBehavior: FloatingLabelBehavior.never,
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8)),
+                    ),
+                    ...List.generate(
+                      list.length,
+                      (index) => Container(
+                        padding: const EdgeInsets.only(bottom: 12.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 4.0),
+                              child: Text(list[index].title),
+                            ),
+                            TextFormField(
+                              decoration: InputDecoration(
+                                labelText: 'Enter your score',
+                                floatingLabelBehavior:
+                                    FloatingLabelBehavior.never,
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8)),
+                              ),
+                              onChanged: (val) {
+                                list[index] = Subject(
+                                    title: list[index].title, score: val);
+                              },
+                            ),
+                          ],
                         ),
-                        onChanged: (val) {
-                          list[index] =
-                              Subject(title: list[index].title, score: val);
-                        },
                       ),
-                    ],
-                  ),
+                    ),
+                    Container(
+                      width: double.infinity,
+                      height: 60,
+                      padding: EdgeInsets.only(top: 12),
+                      child: ElevatedButton(
+                        child: Text('Subit Answers'),
+                        onPressed: submitAnswers,
+                        style: ButtonStyle(
+                            shape: MaterialStateProperty.all<OutlinedBorder>(
+                                RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8)))),
+                      ),
+                    )
+                  ],
                 ),
               ),
-              Container(
-                width: double.infinity,
-                height: 60,
-                padding: EdgeInsets.only(top: 12),
-                child: ElevatedButton(
-                  child: Text('Subit Answers'),
-                  onPressed: submitAnswers,
-                  style: ButtonStyle(
-                      shape: MaterialStateProperty.all<OutlinedBorder>(
-                          RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8)))),
-                ),
-              )
-            ],
-          ),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Add extra subject',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
+            ),
+            floatingActionButton: FloatingActionButton(
+              onPressed: _incrementCounter,
+              tooltip: 'Add extra subject',
+              child: Icon(Icons.add),
+            ), // This trailing comma makes auto-formatting nicer for build methods.
+          );
+        });
   }
 }
