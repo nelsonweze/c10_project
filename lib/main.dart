@@ -3,6 +3,7 @@ import 'package:c10_project/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'backend.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -106,9 +107,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Card(
                   child: FutureBuilder<bool>(
                       future: Future.delayed(Duration(seconds: 4), () {
+                        var val = suggest(
+                            list.map((e) => int.parse(e.score)).toList());
                         return Future.value(true);
                       }),
                       builder: (context, snapshot) {
+                        var val = suggest(
+                            list.map((e) => int.parse(e.score)).toList());
                         if (!snapshot.hasData)
                           return Padding(
                             padding: const EdgeInsets.all(12.0),
@@ -202,6 +207,7 @@ class _MyHomePageState extends State<MyHomePage> {
             body: Center(
               child: Container(
                 constraints: BoxConstraints(maxWidth: 400),
+                padding: EdgeInsets.symmetric(horizontal: 12),
                 child: ListView(
                   children: <Widget>[
                     Container(

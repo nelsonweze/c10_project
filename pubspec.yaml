@@ -14,6 +14,9 @@ dependencies:
   cupertino_icons: ^1.0.2
   firebase_core:
   firebase_auth:
+  firebase_ml_custom:
+  tflite_flutter:
+  path_provider:
 
 dev_dependencies:
   flutter_test:
