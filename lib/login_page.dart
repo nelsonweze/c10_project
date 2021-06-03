@@ -1,3 +1,4 @@
+import 'package:c10_project/backend.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/material.dart';
@@ -72,13 +73,13 @@ class _LoginPageState extends State<LoginPage> {
                             child: ElevatedButton(
                                 child: Text('Sign in'),
                                 onPressed: () async {
-                                  var user;
+                                  UserCredential user;
                                   try {
                                     user = await FirebaseAuth.instance
                                         .signInWithEmailAndPassword(
                                             email: _email.text,
                                             password: _password.text);
-                                    print(user);
+
                                     return Navigator.pop(context);
                                   } on FirebaseAuthException catch (e) {
                                     if (e.code == 'user-not-found') {
@@ -88,6 +89,9 @@ class _LoginPageState extends State<LoginPage> {
                                                 email: _email.text,
                                                 password: _password.text);
                                         print(user);
+                                        saveUser(
+                                            email: user.user.email,
+                                            uid: user.user.uid);
                                         return Navigator.pop(context);
                                       } on FirebaseAuthException catch (e) {
                                         print(e.message);

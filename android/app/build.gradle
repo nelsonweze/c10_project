@@ -34,6 +34,7 @@ android {
     aaptOptions {
         noCompress 'tflite'
         noCompress 'lite'
+        ignoreAssetsPattern "!x86:!*ffprobe"
     }
 
     defaultConfig {

@@ -1,5 +1,5 @@
-import 'dart:math';
 import 'package:c10_project/login_page.dart';
+import 'package:c10_project/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -13,7 +13,7 @@ void main() async {
 
 class Subject {
   final String title;
-  final String score;
+  final double score;
 
   Subject({this.score, this.title});
 }
@@ -37,14 +37,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
   List<Subject> list = [
-    Subject(title: 'English', score: ''),
-    Subject(title: 'Mathematics', score: ''),
-    Subject(title: 'French', score: ''),
-    Subject(title: 'Russian Language', score: ''),
-    Subject(title: 'History', score: ''),
+    Subject(title: 'English', score: 0),
+    Subject(title: 'Mathematics', score: 0),
+    Subject(title: 'Chemistry', score: 0),
+    Subject(title: 'Biology', score: 0),
+    Subject(title: 'Physics', score: 0),
   ];
 
   void _incrementCounter() async {
@@ -107,55 +105,59 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Card(
                   child: FutureBuilder<bool>(
                       future: Future.delayed(Duration(seconds: 4), () {
-                        var val = suggest(
-                            list.map((e) => int.parse(e.score)).toList());
                         return Future.value(true);
                       }),
                       builder: (context, snapshot) {
-                        var val = suggest(
-                            list.map((e) => int.parse(e.score)).toList());
+                        var val = suggest(list.map((e) => e.score).toList());
+                        saveUser(value: val.value, key: val.key);
                         if (!snapshot.hasData)
-                          return Padding(
+                          return Container(
                             padding: const EdgeInsets.all(12.0),
-                            child: Column(
-                              children: [
-                                CircularProgressIndicator(),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 18.0, bottom: 12),
-                                  child: Text(
-                                    'Please wait while we process your answers and recommend some subjects you need to retake',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyText2
-                                        .copyWith(fontSize: 14),
-                                  ),
-                                )
-                              ],
+                            child: Center(
+                              child: Column(
+                                children: [
+                                  CircularProgressIndicator(),
+                                  Container(
+                                    alignment: Alignment.center,
+                                    padding: const EdgeInsets.only(
+                                        top: 18.0, bottom: 12),
+                                    child: Text(
+                                      'Please wait while we process your answers and recommend courses',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyText2
+                                          .copyWith(fontSize: 14),
+                                    ),
+                                  )
+                                ],
+                              ),
                             ),
                           );
                         else
                           return Center(
                             child: Padding(
                               padding: const EdgeInsets.all(12.0),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    'You need to retake ${list[Random().nextInt(list.length - 1)].title}',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyText2
-                                        .copyWith(fontSize: 14),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: TextButton(
-                                      child: Text('Close'),
-                                      onPressed: () => Navigator.pop(context),
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      'Your scores fit in ${val.key}. \n You can choose from these courses: ${val.value}',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyText2
+                                          .copyWith(fontSize: 16),
+                                      textAlign: TextAlign.center,
                                     ),
-                                  )
-                                ],
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: TextButton(
+                                        child: Text('Close'),
+                                        onPressed: () => Navigator.pop(context),
+                                      ),
+                                    )
+                                  ],
+                                ),
                               ),
                             ),
                           );
@@ -165,6 +167,12 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           );
         });
+  }
+
+  @override
+  void initState() {
+    loadTFLiteModel();
+    super.initState();
   }
 
   @override
@@ -182,25 +190,23 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               centerTitle: true,
               actions: [
-                loggedIn
-                    ? Center(
-                        child: Text(user.email,
-                            style: TextStyle(
-                              color: Colors.white,
-                            )),
-                      )
-                    : TextButton(
-                        child: Text('Log in',
-                            style: TextStyle(
-                              color: Colors.white,
-                            )),
-                        onPressed: () => Navigator.push(
-                            context,
-                            DialogRoute(
-                                context: context,
-                                builder: (context) => LoginPage()))),
+                TextButton(
+                    child: Text(loggedIn ? 'Profile' : 'Log in',
+                        style: TextStyle(
+                          color: Colors.white,
+                        )),
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          loggedIn
+                              ? MaterialPageRoute(
+                                  builder: (context) => ProfilePage())
+                              : DialogRoute(
+                                  context: context,
+                                  builder: (context) => LoginPage()));
+                    }),
                 SizedBox(
-                  width: 60,
+                  width: 20,
                 )
               ],
             ),
@@ -236,9 +242,11 @@ class _MyHomePageState extends State<MyHomePage> {
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8)),
                               ),
+                              keyboardType: TextInputType.number,
                               onChanged: (val) {
                                 list[index] = Subject(
-                                    title: list[index].title, score: val);
+                                    title: list[index].title,
+                                    score: int.parse(val) + 0.00);
                               },
                             ),
                           ],
@@ -250,7 +258,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       height: 60,
                       padding: EdgeInsets.only(top: 12),
                       child: ElevatedButton(
-                        child: Text('Subit Answers'),
+                        child: Text('Submit'),
                         onPressed: submitAnswers,
                         style: ButtonStyle(
                             shape: MaterialStateProperty.all<OutlinedBorder>(

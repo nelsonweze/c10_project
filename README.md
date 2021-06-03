@@ -20,3 +20,11 @@ classes for them to undertake based on their input.
 - merge to the dev branch
 - create a merge request to master & test main
 - merge to the main
+
+
+## Screenshots of Finished work
+
+<p>
+<img src="screenshots/home.png" width ="200px">
+<img src="screenshots/suggested.png" width ="200px">
+</p>

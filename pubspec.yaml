@@ -1,5 +1,5 @@
 name: c10_project
-description: A new Flutter project.
+description: The development of a mobile application that recommends to a freshman classes for them to undertake based on their input.
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
@@ -14,7 +14,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   firebase_core:
   firebase_auth:
-  firebase_ml_custom:
+  cloud_firestore:
   tflite_flutter:
   path_provider:
 
@@ -28,6 +28,6 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
+  assets:
+  - assets/
   #   - images/a_dot_ham.jpeg
